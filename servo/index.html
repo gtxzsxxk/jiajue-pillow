@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>加爵控制网页</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container" id="app">
+        <div class="row mt-5">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <h3>连接舵机</h3>
+                <hr>
+                <input type="password" name="pwd" class="form-control" value="" placeholder="请输入口令" />
+                <button class="btn btn-primary mt-2">保存</button>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-sm-3 mt-2">
+                <h3>
+                    舵机直接控制
+                </h3>
+                <hr />
+                <p>请谨慎操作，此方法对舵机的角度输出是实时响应的。尽量不要拖动range条</p>
+                <input type="range" class="form-control" min="900" max="2100" v-model:value="servo_millsecond" />
+                <p>舵机：{{servo_millsecond}} ms</p>
+                <button class="btn btn-primary mt-2" v-on:click="servo_ccw_minor">逆时针微调</button>
+                <button class="btn btn-primary mt-2" v-on:click="servo_cw_minor">顺时针微调</button>
+                <br />
+                <label>步长</label>
+                <input type="number" name="rotate_step" class="form-control" v-model:value="step" />
+                <label>ms</label>
+            </div>
+            <div class="col-sm-3 mt-2">
+                <h3>
+                    姿态手动控制
+                </h3>
+                <hr />
+                <p>清等待舵机就位后再进行下一步操作</p>
+                <p>从姿态</p>
+                <button class="btn btn-primary mt-2">自由躺/平躺模式</button>
+                <button class="btn btn-primary mt-2">左倾模式</button>
+                <button class="btn btn-primary mt-2">右倾模式</button>
+                <button class="btn btn-primary mt-2">后仰模式</button>
+                <p>从方位</p>
+                <button class="btn btn-primary mt-2">进动至七点钟</button>
+                <button class="btn btn-primary mt-2">进动至十一点钟</button>
+                <button class="btn btn-primary mt-2">进动至一点钟</button>
+                <button class="btn btn-primary mt-2">进动至五点钟</button>
+            </div>
+            <div class="col-sm-3 mt-2">
+                <h3>
+                    速度控制
+                </h3>
+                <hr />
+                <p>谨慎操作，本速度仅节制姿态手动控制</p>
+                <label>单位角度转动延迟</label>
+                <input type="number" name="deg_delay" class="form-control" value="100" placeholder="" />
+                <label>ms</label>
+                <br />
+                <button class="btn btn-danger mt-2">紧急制动</button>
+            </div>
+            <div class="col-sm-3 mt-2">
+                <h3>
+                    输出
+                </h3>
+                <textarea style="height: 100%;width: 100%;">
+                    {{log}}
+                </textarea>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+        let oldMs=0;
+        window.setInterval(()=>{
+            if(oldMs==0){
+
+            }else{
+                if(oldMs!=app.servo_millsecond){
+                    writeMillsecond();
+                }
+            }
+            oldMs=app.servo_millsecond;
+        },500);
+        function writeMillsecond() {
+            $.ajax({
+                url: "/servo/millseconds/"+app.servo_millsecond,
+                success: function (result) {
+                    app.log+=result+"\r\n";
+                }
+            });
+        }
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                servo_millsecond: 1500,
+                step:1,
+                log:""
+            },
+            methods: {
+                servo_ccw_minor: function () {
+                    this.servo_millsecond-=this.step;
+                },
+                servo_cw_minor: function () {
+                    this.servo_millsecond+=this.step;
+                }
+            },
+            watch:{
+            }
+        })
+    </script>
+</body>
+
+</html>
