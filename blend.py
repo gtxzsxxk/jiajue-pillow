@@ -20,7 +20,7 @@ def move_obj(which,dist):
         i.co.z+=dist
         
 def save_txt(div_cnt):
-    fp=open("splice_%s+%d.txt"%(target_name,div_cnt),"w+")
+    fp=open("splice_%s+%.2f.txt"%(target_name,div_cnt*step),"w+")
     for i in plane_object.data.vertices:
         fp.write("%.8f %.8f\r\n"%(i.co.x,i.co.y))
     fp.close()
