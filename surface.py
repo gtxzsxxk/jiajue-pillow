@@ -18,9 +18,16 @@ def PickFirstNode(nodes):
     return [first_node, first_node_index]
 
 
+def vector_angle(v_1, v_2):
+    mod_v_1 = math.sqrt(v_1[0]**2+v_1[1]**2)
+    mod_v_2 = math.sqrt(v_2[0]**2+v_2[1]**2)
+    return math.acos((v_1[0]*v_2[0]+v_1[1]*v_2[1])/mod_v_1/mod_v_2)
+
+
 def CcwSort(node2sort, first_node, first_node_index):
     sorted_node = []
     last_node = first_node
+    last_sec_node = None
     visited = []
     for i in range(0, node2sort.__len__()):
         visited.append(False)
@@ -38,14 +45,22 @@ def CcwSort(node2sort, first_node, first_node_index):
             dy = node2sort[i][1]-last_node[1]
             dist = math.sqrt(dx**2+dy**2)
             if dist < max_dist:
-                max_dist = dist
                 if last_node[0] == first_node[0] and last_node[1] == first_node[1] and dx < 0:
                     continue
+                if last_sec_node is not None:
+                    vec_1 = np.array(
+                        [last_node[0]-last_sec_node[0], last_node[1]-last_sec_node[1]])
+                    vec_2 = np.array([node2sort[i][0]-last_node[0], node2sort[i][1]-last_node[1]])
+                    if vector_angle(vec_1, vec_2) > math.pi/2:
+                        continue
+                max_dist = dist
                 nearest_node = node2sort[i]
                 nearest_node_index = i
         visited[nearest_node_index] = True
         visited_cnt += 1
-        last_node = nearest_node
+        if last_node is not None:
+            last_sec_node = last_node
+            last_node = nearest_node
     sorted_node.append(last_node)
     return sorted_node
 
@@ -176,7 +191,7 @@ def generate_surface(menu):
             X.append(step+0.15)
             Y.append(n[0])
             Z.append(n[1])
-        step += 0.005
+        step += 0.02
     fig = plt.figure()
     plt.gca().set_aspect(1)
     ax = fig.add_subplot(111, projection='3d')
@@ -189,5 +204,6 @@ def generate_surface(menu):
     plt.ylim(-0.2, 0.2)
 
     plt.show()
+
 
 generate_surface("dataset_test")

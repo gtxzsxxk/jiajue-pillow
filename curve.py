@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-fp = open("dataset_test/splice_SPRING2001+5.txt", "r")
+fp = open("dataset_test/splice_SPRING2001+4.00.txt", "r")
 text = fp.read()
 fp.close()
 X = []
@@ -41,14 +41,21 @@ def PickFirstNode():
             max_dist = abs(X[i])
             first_node = np.array([X[i], Y[i]])
             first_node_index = i
+    pass
 
 
 node_sorted = []  # vectors
 
-
+def vector_angle(v_1,v_2):
+    mod_v_1=math.sqrt(v_1[0]**2+v_1[1]**2)
+    mod_v_2=math.sqrt(v_2[0]**2+v_2[1]**2)
+    return math.acos((v_1[0]*v_2[0]+v_1[1]*v_2[1])/mod_v_1/mod_v_2)
+    
+    
 def CcwSort():
     global node_sorted
     last_node = first_node
+    last_sec_node = None
     visited = []
     for i in range(0, X.__len__()):
         visited.append(False)
@@ -66,14 +73,21 @@ def CcwSort():
             dy = Y[i]-last_node[1]
             dist = math.sqrt(dx**2+dy**2)
             if dist < max_dist:
-                max_dist = dist
                 if last_node[0] == first_node[0] and last_node[1] == first_node[1] and dx < 0:
                     continue
+                if last_sec_node is not None:
+                    vec_1=np.array([last_node[0]-last_sec_node[0],last_node[1]-last_sec_node[1]])
+                    vec_2=np.array([X[i]-last_node[0],Y[i]-last_node[1]])
+                    if vector_angle(vec_1,vec_2)>math.pi/2:
+                        continue
+                max_dist = dist
                 nearest_node = [X[i], Y[i]]
                 nearest_node_index = i
         visited[nearest_node_index] = True
         visited_cnt += 1
-        last_node = nearest_node
+        if last_node is not None:
+            last_sec_node = last_node
+            last_node = nearest_node
     node_sorted.append(last_node)
 
 
@@ -89,7 +103,7 @@ for i in node_sorted:
     axises.spines['bottom'].set_position(('data', 0))
     axises.set_aspect(1)
     plt.xlim(-0.12, 0.12)
-    plt.ylim(-0.07, 0.18)
+    plt.ylim(-0.10, 0.20)
     plt.scatter([i[0]], [i[1]], marker='+')
     plt.show()
     plt.pause(0.001)
