@@ -170,14 +170,15 @@ def generate_surface(menu):
     step = 0
     for f in dir_list:
         f_path = os.path.join(menu, f)
-        curve = generate_curve(f_path, v_centerize=np.array([0, 0]))
+        curve = generate_curve(f_path, v_centerize=np.array([0, 0.05]))
         print(f_path)
         for n in curve:
             X.append(step)
             Y.append(n[0])
             Z.append(n[1])
-        step += 0.05
+        step += 0.005
     fig = plt.figure()
+    plt.gca().set_aspect(1)
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(X, Y, Z, marker='+')
 
