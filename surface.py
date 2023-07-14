@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import os
 
 
 def PickFirstNode(nodes):
@@ -147,18 +148,43 @@ def generate_curve(filename, v_centerize=np.array([0, 0.05]), theta=math.pi/2):
         X.append(i[0])
         Y.append(i[1])
 
-    plt.clf()  # 清除图像
-    axises = plt.gca()
-    axises.spines["right"].set_color('none')
-    axises.spines["top"].set_color('none')
-    axises.spines['left'].set_position(('data', 0))
-    axises.spines['bottom'].set_position(('data', 0))
-    axises.set_aspect(1)
-    plt.xlim(-0.3, 0.3)
-    plt.ylim(-0.2, 0.2)
-    plt.scatter(X, Y, marker='+')
-    plt.show()
+    # plt.clf()  # 清除图像
+    # axises = plt.gca()
+    # axises.spines["right"].set_color('none')
+    # axises.spines["top"].set_color('none')
+    # axises.spines['left'].set_position(('data', 0))
+    # axises.spines['bottom'].set_position(('data', 0))
+    # axises.set_aspect(1)
+    # plt.xlim(-0.3, 0.3)
+    # plt.ylim(-0.2, 0.2)
+    # plt.scatter(X, Y, marker='+')
+    # plt.show()
     return curve
 
 
-generate_curve("dataset_test/splice_SPRING2001+0.txt",v_centerize=np.array([0, 0.02]))
+def generate_surface(menu):
+    X = []
+    Y = []
+    Z = []
+    dir_list = os.listdir(menu)
+    step = 0
+    for f in dir_list:
+        f_path = os.path.join(menu, f)
+        curve = generate_curve(f_path, v_centerize=np.array([0, 0]))
+        print(f_path)
+        for n in curve:
+            X.append(step)
+            Y.append(n[0])
+            Z.append(n[1])
+        step += 0.05
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(X, Y, Z, marker='+')
+
+    ax.set_xlabel('X Label')
+    ax.set_ylabel('Y Label')
+    ax.set_zlabel('Z Label')
+
+    plt.show()
+
+generate_surface("dataset_test")
