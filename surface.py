@@ -170,10 +170,10 @@ def generate_surface(menu):
     step = 0
     for f in dir_list:
         f_path = os.path.join(menu, f)
-        curve = generate_curve(f_path, v_centerize=np.array([0, 0.05]))
+        curve = generate_curve(f_path, v_centerize=np.array([0, 0]))
         print(f_path)
         for n in curve:
-            X.append(step)
+            X.append(step+0.15)
             Y.append(n[0])
             Z.append(n[1])
         step += 0.005
@@ -185,6 +185,8 @@ def generate_surface(menu):
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
+    plt.xlim(0, 0.4)
+    plt.ylim(-0.2, 0.2)
 
     plt.show()
 

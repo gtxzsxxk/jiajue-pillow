@@ -46,13 +46,15 @@ for cnt in range(0, division):
         plane_object = obj
         
     set_obj(plane_object,initial_height/100)
-    move_obj(plane_object,-step/100)
+    move_obj(plane_object,-step*cnt/100)
     plane_object.modifiers.new("MODIFIER","BOOLEAN")
     plane_object.modifiers[0].object = target_object
     plane_object.modifiers[0].operation = "INTERSECT"
     plane_object.modifiers[0].solver = "FAST"
     bpy.ops.object.modifier_apply(modifier="MODIFIER")
     save_txt(cnt)
+    bpy.data.objects.remove(plane_object)
+    
         
     
     
