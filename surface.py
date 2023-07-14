@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 def PickFirstNode(nodes):
     max_dist=999
@@ -30,19 +31,84 @@ def CcwSort(node2sort,first_node,first_node_index):
         for i in range(0,node2sort.__len__()):
             if visited[i] is True:
                 continue
-            dx=X[i]-last_node[0]
-            dy=Y[i]-last_node[1]
+            dx=node2sort[i][0]-last_node[0]
+            dy=node2sort[i][1]-last_node[1]
             dist=math.sqrt(dx**2+dy**2)
             if dist<max_dist:
                 max_dist=dist
                 if last_node[0]==first_node[0] and last_node[1]==first_node[1] and dx<0:
                     continue
-                nearest_node=[X[i],Y[i]]
+                nearest_node=node2sort[i]
                 nearest_node_index=i
         visited[nearest_node_index]=True
         visited_cnt+=1
         last_node=nearest_node
-    node_sorted.append(last_node)
+    sorted_node.append(last_node)
+    return sorted_node
+
+def move_nodes(src,b):
+    res=[]
+    for i in src:
+        res.append(np.array(i)+b)
+    return res
+
+def rotate_cw_nodes(src,angle):
+    res=[]
+    R=np.array([[math.cos(-angle),-math.sin(-angle)],[math.sin(-angle),math.cos(-angle)]])
+    for i in src:
+        res.append(np.matmul(R,i))
+    return res
+
+def generate_curve_from_sample(sample_nodes,is_ccw,tap_len=20,tap_dist=2/100,tap_len_const=20):
+    curve_generated=[]
+    temp_nodes=sample_nodes
+    start_index=1
+    if is_ccw:
+        start_index=sample_nodes.__len__()-1
+    angle_accumulated=0
+    while angle_accumulated<math.pi/2:
+        tangent=abs(temp_nodes[start_index][0]/temp_nodes[start_index][1])
+        d_theta=math.atan(tangent)
+        radius=math.sqrt(temp_nodes[start_index][0]**2+temp_nodes[start_index][1]**2)
+        s=radius*d_theta
+        if is_ccw is False:
+            curve_generated=move_nodes(curve_generated,np.array([-s,0]))
+        else:
+            curve_generated=move_nodes(curve_generated,np.array([s,0]))
+        curve_generated.append(np.array([0,-radius]))
+        if is_ccw is False:
+            temp_nodes=rotate_cw_nodes(temp_nodes,d_theta)
+        else:
+            temp_nodes=rotate_cw_nodes(temp_nodes,-d_theta)
+        angle_accumulated+=d_theta
+        if is_ccw is False:
+            start_index+=1
+        else:
+            start_index-=1
+    last_node=None
+    tap_mode=False
+    while True and tap_len>0:
+        if tap_mode:
+            curve_generated.append(np.array([temp_nodes[start_index][0],temp_nodes[start_index][1]-\
+                                tap_dist*(tap_len_const-tap_len)/tap_len_const]))
+            tap_len-=1
+        else:
+            if last_node is not None:
+                dy=temp_nodes[start_index][1]-last_node[1]
+                if is_ccw is False:
+                    if dy>0:
+                        tap_mode=True
+                else:
+                    if dy>0:
+                        tap_mode=True
+            curve_generated.append(np.array([temp_nodes[start_index][0],temp_nodes[start_index][1]]))
+        last_node=temp_nodes[start_index]
+        if is_ccw is False:
+            start_index+=1
+        else:
+            start_index-=1
+    return curve_generated
+    
 
 def generate_curve(filename,v_centerize=np.array([0,0]),theta=math.pi/2):
     fp = open(filename, "r")
@@ -59,117 +125,19 @@ def generate_curve(filename,v_centerize=np.array([0,0]),theta=math.pi/2):
         all_nodes.append(v_1)
     first_node=[]
     first_node_index=0
-    node_sorted=[] #vectors
-    PickFirstNode()
-    CcwSort()
-    plt.scatter([first_node[0]],[first_node[1]],marker='v')
-    for i in node_sorted:
-        plt.ion()  #打开交互模式
-        axises = plt.gca()
-        axises.spines["right"].set_color('none')
-        axises.spines["top"].set_color('none')
-        axises.spines['left'].set_position(('data', 0))
-        axises.spines['bottom'].set_position(('data', 0))
-        axises.set_aspect(1)
-        plt.xlim(-0.12, 0.12)
-        plt.ylim(-0.07, 0.18)
-        plt.scatter([i[0]],[i[1]],marker='+')
-        plt.show()
-        plt.pause(0.001)
-        # plt.clf()  #清除图像
-
-    def move_nodes(src,b):
-        res=[]
-        for i in src:
-            res.append(np.array(i)+b)
-        return res
-
-    def rotate_cw_nodes(src,angle):
-        res=[]
-        R=np.array([[math.cos(-angle),-math.sin(-angle)],[math.sin(-angle),math.cos(-angle)]])
-        for i in src:
-            res.append(np.matmul(R,i))
-        return res
-            
-    curve=[]
-    def generate_curve(dir):
-        global curve
-        temp_nodes=node_sorted
-        start_index=1
-        if dir=='ccw':
-            start_index=node_sorted.__len__()-1
-        angle_accumulated=0
-        while angle_accumulated<math.pi/2:
-            tangent=abs(temp_nodes[start_index][0]/temp_nodes[start_index][1])
-            d_theta=math.atan(tangent)
-            radius=math.sqrt(temp_nodes[start_index][0]**2+temp_nodes[start_index][1]**2)
-            s=radius*d_theta
-            if dir=='cw':
-                curve=move_nodes(curve,np.array([-s,0]))
-            else:
-                curve=move_nodes(curve,np.array([s,0]))
-            curve.append(np.array([0,-radius]))
-            if dir=='cw':
-                temp_nodes=rotate_cw_nodes(temp_nodes,d_theta)
-            else:
-                temp_nodes=rotate_cw_nodes(temp_nodes,-d_theta)
-            angle_accumulated+=d_theta
-            if dir=='cw':
-                start_index+=1
-            else:
-                start_index-=1
-            
-            # 演示功能
-            plt.ion()  #打开交互模式
-            plt.clf()  #清除图像
-            axises = plt.gca()
-            axises.spines["right"].set_color('none')
-            axises.spines["top"].set_color('none')
-            axises.spines['left'].set_position(('data', 0))
-            axises.spines['bottom'].set_position(('data', 0))
-            axises.set_aspect(1)
-            plt.xlim(-0.3, 0.3)
-            plt.ylim(-0.2, 0.2)
-            # plt.scatter([i[0]],[i[1]],marker='+')
-            for k in curve:
-            plt.scatter([k[0]],[k[1]],marker='+')
-            for k in temp_nodes:
-                plt.scatter([k[0]],[k[1]],marker='.')
-            plt.show()
-            plt.pause(0.01)
-        last_node=None
-        tap_len=20
-        tap_mode=False
-        tap_dist=2/100
-        tap_len_const=20
-        while True and tap_len>0:
-            if tap_mode:
-                curve.append(np.array([temp_nodes[start_index][0],temp_nodes[start_index][1]-\
-                                    tap_dist*(tap_len_const-tap_len)/tap_len_const]))
-                plt.scatter([temp_nodes[start_index][0]],[temp_nodes[start_index][1]-\
-                    tap_dist*(tap_len_const-tap_len)/tap_len_const],marker='+')
-                tap_len-=1
-            else:
-                if last_node is not None:
-                    dy=temp_nodes[start_index][1]-last_node[1]
-                    if dir=='cw':
-                        if dy>0:
-                            tap_mode=True
-                    else:
-                        if dy>0:
-                            tap_mode=True
-                curve.append(np.array([temp_nodes[start_index][0],temp_nodes[start_index][1]]))
-                plt.scatter([temp_nodes[start_index][0]],[temp_nodes[start_index][1]],marker='+')
-            last_node=temp_nodes[start_index]
-            if dir=='cw':
-                start_index+=1
-            else:
-                start_index-=1
-            plt.show()
-            plt.pause(0.01)
-
-    generate_curve('cw')
+    [first_node,first_node_index]=PickFirstNode(all_nodes)
+    node_sorted=CcwSort(all_nodes,first_node,first_node_index)
+    curve=generate_curve_from_sample(node_sorted,False)
     curve=move_nodes(curve,np.array([-curve[0][0],0]))
-    generate_curve('ccw')
-    plt.pause(120)
+    curve+=generate_curve_from_sample(node_sorted,True)
+    X=[]
+    Y=[]
+    for i in curve:
+        X.append(i[0])
+        Y.append(i[1])
+    plt.gca().set_aspect(1)
+    plt.scatter(X,Y,marker='+')
+    plt.show()
+    return curve
     
+generate_curve("dataset_test/splice_SPRING2001+0.txt")
