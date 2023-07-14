@@ -148,6 +148,36 @@ def generate_curve(dir):
             plt.scatter([k[0]],[k[1]],marker='.')
         plt.show()
         plt.pause(0.01)
+    last_node=None
+    tap_len=20
+    tap_mode=False
+    tap_dist=2/100
+    tap_len_const=20
+    while True and tap_len>0:
+        if tap_mode:
+            curve.append(np.array([temp_nodes[start_index][0],temp_nodes[start_index][1]-\
+                                   tap_dist*(tap_len_const-tap_len)/tap_len_const]))
+            plt.scatter([temp_nodes[start_index][0]],[temp_nodes[start_index][1]-\
+                tap_dist*(tap_len_const-tap_len)/tap_len_const],marker='+')
+            tap_len-=1
+        else:
+            if last_node is not None:
+                dy=temp_nodes[start_index][1]-last_node[1]
+                if dir=='cw':
+                    if dy>0:
+                        tap_mode=True
+                else:
+                    if dy>0:
+                        tap_mode=True
+            curve.append(np.array([temp_nodes[start_index][0],temp_nodes[start_index][1]]))
+            plt.scatter([temp_nodes[start_index][0]],[temp_nodes[start_index][1]],marker='+')
+        last_node=temp_nodes[start_index]
+        if dir=='cw':
+            start_index+=1
+        else:
+            start_index-=1
+        plt.show()
+        plt.pause(0.01)
 
 generate_curve('cw')
 curve=move_nodes(curve,np.array([-curve[0][0],0]))
