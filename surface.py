@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import os
 
 
@@ -45,23 +46,28 @@ def CcwSort(node2sort, first_node, first_node_index):
             dy = node2sort[i][1]-last_node[1]
             dist = math.sqrt(dx**2+dy**2)
             if dist < max_dist:
+                if dist >= 0.04:
+                    continue
                 if last_node[0] == first_node[0] and last_node[1] == first_node[1] and dx < 0:
                     continue
                 if last_sec_node is not None:
                     vec_1 = np.array(
                         [last_node[0]-last_sec_node[0], last_node[1]-last_sec_node[1]])
-                    vec_2 = np.array([node2sort[i][0]-last_node[0], node2sort[i][1]-last_node[1]])
-                    if vector_angle(vec_1, vec_2) > math.pi/2:
+                    vec_2 = np.array(
+                        [node2sort[i][0]-last_node[0], node2sort[i][1]-last_node[1]])
+                    if vector_angle(vec_1, vec_2) > math.pi/4*3:
                         continue
                 max_dist = dist
                 nearest_node = node2sort[i]
                 nearest_node_index = i
         visited[nearest_node_index] = True
         visited_cnt += 1
+        if nearest_node.__len__() == 0:
+            continue
         if last_node is not None:
             last_sec_node = last_node
             last_node = nearest_node
-    sorted_node.append(last_node)
+    # sorted_node.append(last_node)
     return sorted_node
 
 
@@ -191,17 +197,18 @@ def generate_surface(menu):
             X.append(step+0.15)
             Y.append(n[0])
             Z.append(n[1])
-        step += 0.02
-    fig = plt.figure()
-    plt.gca().set_aspect(1)
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(X, Y, Z, marker='+')
+        step += 0.005
+    fig = plt.figure()  # 创建一个画布figure，然后在这个画布上加各种元素。
+    ax = Axes3D(fig)  # 将画布作用于 Axes3D 对象上。
+    ax.scatter(X, Y, Z, c='g', marker='*')
 
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
-    plt.xlim(0, 0.4)
-    plt.ylim(-0.2, 0.2)
+    ax.set_xlabel('X label')  # 画出坐标轴
+    ax.set_ylabel('Y label')
+    ax.set_zlabel('Z label')
+    ax.set_xlim(0.1,0.3)
+    ax.set_ylim(-0.1,0.1)
+    ax.set_zlim(-0.1,0)
+    ax.set_box_aspect([1,1,1])
 
     plt.show()
 

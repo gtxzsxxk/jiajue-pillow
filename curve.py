@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-fp = open("dataset_test/splice_SPRING2001+4.00.txt", "r")
+fp = open("dataset_test/splice_SPRING2001+1.00.txt", "r")
 text = fp.read()
 fp.close()
 X = []
@@ -73,22 +73,26 @@ def CcwSort():
             dy = Y[i]-last_node[1]
             dist = math.sqrt(dx**2+dy**2)
             if dist < max_dist:
+                if dist>=0.04:
+                    continue
                 if last_node[0] == first_node[0] and last_node[1] == first_node[1] and dx < 0:
                     continue
                 if last_sec_node is not None:
                     vec_1=np.array([last_node[0]-last_sec_node[0],last_node[1]-last_sec_node[1]])
                     vec_2=np.array([X[i]-last_node[0],Y[i]-last_node[1]])
-                    if vector_angle(vec_1,vec_2)>math.pi/2:
+                    if vector_angle(vec_1,vec_2)>math.pi/4*3:
                         continue
                 max_dist = dist
                 nearest_node = [X[i], Y[i]]
                 nearest_node_index = i
         visited[nearest_node_index] = True
         visited_cnt += 1
+        if nearest_node.__len__()==0:
+            continue
         if last_node is not None:
             last_sec_node = last_node
             last_node = nearest_node
-    node_sorted.append(last_node)
+    # node_sorted.append(last_node)
 
 
 PickFirstNode()
