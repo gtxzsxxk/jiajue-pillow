@@ -183,6 +183,10 @@ def generate_curve(filename, v_centerize=np.array([0, 0.05]), theta=math.pi/2):
     return curve
 
 
+def print_polynomial(poly):
+    for i in poly
+
+
 def generate_polynomials(menu):
     dir_list = os.listdir(menu)
     step = 0
