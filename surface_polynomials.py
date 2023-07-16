@@ -183,34 +183,32 @@ def generate_curve(filename, v_centerize=np.array([0, 0.05]), theta=math.pi/2):
     return curve
 
 
-def generate_surface(menu):
-    X = []
-    Y = []
-    Z = []
+def generate_polynomials(menu):
     dir_list = os.listdir(menu)
     step = 0
     for f in dir_list:
         f_path = os.path.join(menu, f)
         curve = generate_curve(f_path, v_centerize=np.array([0, 0]))
         print(f_path)
+        X=[]
+        Y=[]
         for n in curve:
-            X.append(step+0.15)
-            Y.append(n[0])
-            Z.append(n[1])
+            X.append(n[0])
+            Y.append(n[1])
         step += 0.005
-    fig = plt.figure()  # 创建一个画布figure，然后在这个画布上加各种元素。
-    ax = Axes3D(fig)  # 将画布作用于 Axes3D 对象上。
-    ax.scatter(X, Y, Z, c='g', marker='*')
+        z=np.polyfit(X,Y,X.__len__()/4)
+        polynomial=np.poly1d(z)
+        y_vals=polynomial(X)
+        # 画图对比分析
+        plot1 = plt.plot(X, Y, '*', label='original values', color='dimgray')
+        plot2 = plt.plot(X, y_vals, '#23fec4', label='fitting values', linewidth=2)
+        
+        plt.xlabel('x')
+        plt.ylabel('height')
+        plt.legend(loc="best")  # 指定legend的位置,读者可以自己help它的用法
+        plt.title('fitting diagram')
+        plt.show()
+        
 
-    ax.set_xlabel('X label')  # 画出坐标轴
-    ax.set_ylabel('Y label')
-    ax.set_zlabel('Z label')
-    ax.set_xlim(0.1,0.3)
-    ax.set_ylim(-0.1,0.1)
-    ax.set_zlim(-0.1,0)
-    ax.set_box_aspect([1,1,1])
 
-    plt.show()
-
-
-generate_surface("dataset_test")
+generate_polynomials("dataset_test")
