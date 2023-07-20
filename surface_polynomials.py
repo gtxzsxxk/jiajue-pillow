@@ -188,9 +188,9 @@ def print_polynomial(poly:np.poly1d):
     for co in list(poly):
         cnt-=1
         if cnt>0:
-            print("%.5f*x^%d+"%(co,cnt),end="")
+            print("%.8f*x^%d+"%(co,cnt),end="")
         else:
-            print("%.5f"%(co),end="")
+            print("%.8f"%(co),end="")
 
 
 def generate_polynomials(menu):
@@ -208,6 +208,7 @@ def generate_polynomials(menu):
         step += 0.005
         z=np.polyfit(X,Y,X.__len__()/4)
         polynomial=np.poly1d(z)
+        print(f_path)
         print_polynomial(polynomial)
         y_vals=polynomial(X)
         # 画图对比分析
