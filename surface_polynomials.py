@@ -183,8 +183,14 @@ def generate_curve(filename, v_centerize=np.array([0, 0.05]), theta=math.pi/2):
     return curve
 
 
-def print_polynomial(poly):
-    for i in poly
+def print_polynomial(poly:np.poly1d):
+    cnt=list(poly).__len__()
+    for co in list(poly):
+        cnt-=1
+        if cnt>0:
+            print("%.5f*x^%d+"%(co,cnt),end="")
+        else:
+            print("%.5f"%(co),end="")
 
 
 def generate_polynomials(menu):
@@ -202,6 +208,7 @@ def generate_polynomials(menu):
         step += 0.005
         z=np.polyfit(X,Y,X.__len__()/4)
         polynomial=np.poly1d(z)
+        print_polynomial(polynomial)
         y_vals=polynomial(X)
         # 画图对比分析
         plot1 = plt.plot(X, Y, '*', label='original values', color='dimgray')

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-fp = open("dataset_test/splice_SPRING2001+1.00.txt", "r")
+fp = open("dataset_test/splice_SPRING2001+0.00.txt", "r")
 text = fp.read()
 fp.close()
 X = []
