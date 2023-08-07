@@ -1,5 +1,6 @@
 import bpy
 import time
+import os
 
 target_name = "SPRING2001"
 target_object = None
@@ -7,9 +8,10 @@ plane_name = "B_PLANE"
 plane_created = False
 blend_language = 'zh-cn'
 plane_object = None
-division = 20
+division = 10
 step = 0.5  # unit: cm
-initial_height = 6.3  # z-axis, unit: cm
+initial_height = 0  # z-axis, unit: cm
+output_path = "D:\\code\\pillow-srt\\dataset_test"
 
 def set_obj(which,dist):
     for i in which.data.vertices:
@@ -20,7 +22,7 @@ def move_obj(which,dist):
         i.co.z+=dist
         
 def save_txt(div_cnt):
-    fp=open("splice_%s+%.2f.txt"%(target_name,div_cnt*step),"w+")
+    fp=open(os.path.join(output_path,"splice_%s+%.2f.txt"%(target_name,div_cnt*step)),"w+")
     for i in plane_object.data.vertices:
         fp.write("%.8f %.8f\r\n"%(i.co.x,i.co.y))
     fp.close()
