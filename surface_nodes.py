@@ -3,7 +3,7 @@ import math
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os
-
+import json
 
 def PickFirstNode(nodes):
     max_dist = 999
@@ -198,9 +198,12 @@ def generate_surface(menu):
             X.append(step)
             Y.append(n[0])
             Z.append(n[1])
-            vectors.append(np.array([step,n[0],n[1]]))
+            vectors.append([[step,n[0],n[1]]])
         step += 0.001
-    print(vectors.__len__())
+    data = json.dumps(vectors)
+    fp = open("vectors.txt", "w+")
+    fp.write(data)
+    fp.close()
     fig = plt.figure()  # 创建一个画布figure，然后在这个画布上加各种元素。
     ax = Axes3D(fig)  # 将画布作用于 Axes3D 对象上。
     ax.scatter(X, Y, Z, c='g', marker='*')
